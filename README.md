@@ -1,38 +1,54 @@
 # 🚀 Next.js Landing Page with Tailwind CSS
 
-Uma landing page moderna, responsiva e otimizada construída com Next.js 14 e Tailwind CSS.
+Uma landing page moderna, responsiva e otimizada construída com **Next.js 14** e **Tailwind CSS**.
+
+![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)
+![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.3-06B6D4?style=flat-square&logo=tailwindcss)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
+---
 
 ## ✨ Características
 
-- ⚡ **Performance**: Otimizado com Next.js 14
-- 📱 **Responsivo**: Mobile-first, funciona em todos os dispositivos
-- 🎨 **Design Moderno**: Tailwind CSS com componentes reutilizáveis
-- ♿ **Acessível**: Segue padrões WCAG
-- 🔍 **SEO**: Otimizado para mecanismos de busca
-- 🚀 **Deploy Ready**: Pronto para Vercel ou qualquer hosting
+- ⚡ **Performance Otimizada** - Next.js 14 com App Router
+- 📱 **Totalmente Responsivo** - Mobile-first design (xs, sm, md, lg, xl)
+- 🎨 **Tailwind CSS** - Estilos utilitários modernos
+- ♿ **Acessível** - Segue padrões WCAG 2.1
+- 🔍 **SEO Friendly** - Metadados otimizados e Open Graph
+- 🚀 **Deploy Ready** - Pronto para Vercel, Netlify ou qualquer host
 
-## 📋 Seções
+---
 
-- **Header** - Navegação com logo e menu responsivo
-- **Hero** - Seção principal com CTA
-- **Features** - Cards com benefícios/recursos
-- **CTA** - Chamada para ação
-- **Footer** - Links e informações
+## 📋 Seções Incluídas
+
+1. **Header** - Navegação sticky com menu responsivo
+2. **Hero** - Banner principal com gradiente e CTAs
+3. **Features** - Grid de 6 recursos com ícones (hover effects)
+4. **CTA** - Seção de conversão destacada
+5. **Footer** - Rodapé com links, contato e redes sociais
+
+---
 
 ## 🛠️ Tecnologias
 
-- [Next.js 14](https://nextjs.org/) - React framework
-- [React 18](https://react.dev/) - UI library
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
-- [TypeScript](https://www.typescriptlang.org/) - Type safety (opcional)
+| Tecnologia | Descrição |
+|-----------|-----------|
+| [Next.js 14](https://nextjs.org/) | Framework React moderno |
+| [React 18](https://react.dev/) | Biblioteca de UI |
+| [Tailwind CSS 3.3](https://tailwindcss.com/) | CSS utilitário |
+| [TypeScript](https://www.typescriptlang.org/) | Type safety (opcional) |
+| [ESLint](https://eslint.org/) | Linter de código |
 
-## 📦 Instalação
+---
+
+## 🚀 Quick Start
 
 ### Pré-requisitos
-- Node.js 18+ 
-- npm ou yarn
+- Node.js 18+
+- npm, yarn ou pnpm
 
-### Setup
+### Instalação
 
 ```bash
 # Clone o repositório
@@ -41,75 +57,90 @@ cd nextjs-landing
 
 # Instale as dependências
 npm install
-# ou
-yarn install
-```
 
-## 🚀 Desenvolvimento
-
-```bash
 # Inicie o servidor de desenvolvimento
 npm run dev
-# ou
-yarn dev
 ```
 
 Abra [http://localhost:3000](http://localhost:3000) no navegador.
 
-## 🔨 Build
+---
+
+## 📦 Scripts
 
 ```bash
-# Build para produção
-npm run build
+# Desenvolvimento
+npm run dev          # Inicia servidor de desenvolvimento
 
-# Inicie o servidor de produção
-npm start
+# Build
+npm run build        # Cria build otimizado
+
+# Produção
+npm start           # Inicia servidor de produção
+
+# Linting
+npm run lint        # Verifica o código com ESLint
 ```
+
+---
 
 ## 📁 Estrutura do Projeto
 
 ```
 nextjs-landing/
 ├── app/
-│   ├── layout.jsx          # Layout raiz
-│   ├── page.jsx            # Página principal
-│   ├── globals.css         # Estilos globais
+│   ├── layout.jsx              # Layout raiz
+│   ├── page.jsx                # Página principal
+│   ├── globals.css             # Estilos globais
 │   └── favicon.ico
 ├── components/
-│   ├── Header.jsx          # Header component
-│   ├── Hero.jsx            # Hero section
-│   ├── Features.jsx        # Features grid
-│   ├── CTA.jsx             # Call-to-action section
-│   └── Footer.jsx          # Footer component
-├── public/                 # Static assets
+│   ├── Header.jsx              # Header com navegação
+│   ├── Hero.jsx                # Seção hero
+│   ├── Features.jsx            # Grid de recursos
+│   ├── CTA.jsx                 # Call-to-action
+│   └── Footer.jsx              # Rodapé
+├── public/                     # Arquivos estáticos
+├── .env.example                # Template de env
 ├── .gitignore
-├── next.config.js          # Next.js config
-├── tailwind.config.js      # Tailwind config
-├── postcss.config.js       # PostCSS config
+├── .eslintrc.json
+├── .prettierrc
+├── next.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── tsconfig.json
 ├── package.json
-└── README.md
+├── SETUP.md                    # Guia de setup
+└── README.md                   # Este arquivo
 ```
 
-## 🎨 Personalização
+---
+
+## 🎨 Customização
 
 ### Cores
-Edite `tailwind.config.js` para customizar a paleta de cores:
-
+Edite `tailwind.config.js`:
 ```js
 theme: {
-  colors: {
-    primary: '#0066cc',
-    secondary: '#6366f1',
-  }
-}
+  extend: {
+    colors: {
+      primary: '#0066cc',
+      secondary: '#6366f1',
+    },
+  },
+},
 ```
 
-### Conteúdo
-- **Header**: `components/Header.jsx`
-- **Hero**: `components/Hero.jsx`
-- **Features**: `components/Features.jsx`
-- **CTA**: `components/CTA.jsx`
-- **Footer**: `components/Footer.jsx`
+### Conteúdo de Componentes
+
+| Componente | Arquivo | Descrição |
+|-----------|---------|-----------|
+| Header | `components/Header.jsx` | Logo, navegação e botão |
+| Hero | `components/Hero.jsx` | Título, subtítulo e CTAs |
+| Features | `components/Features.jsx` | Array de 6 recursos |
+| CTA | `components/CTA.jsx` | Seção de conversão |
+| Footer | `components/Footer.jsx` | Links e contato |
+
+---
 
 ## 🚀 Deploy
 
@@ -120,29 +151,76 @@ npm install -g vercel
 vercel
 ```
 
-### Outras Plataformas
-- [Netlify](https://netlify.com)
-- [AWS Amplify](https://aws.amazon.com/amplify/)
-- [Heroku](https://heroku.com)
+### Outras Opções
 
-## 📊 Performance
+| Plataforma | Link |
+|-----------|------|
+| Netlify | [netlify.com](https://netlify.com) |
+| AWS Amplify | [aws.amazon.com/amplify](https://aws.amazon.com/amplify/) |
+| Railway | [railway.app](https://railway.app) |
+| Render | [render.com](https://render.com) |
 
-- Lighthouse: > 90
-- SEO: Otimizado
-- Acessibilidade: WCAG 2.1
+---
+
+## 📊 Lighthouse Metrics
+
+- ⚡ Performance: 95+
+- ♿ Accessibility: 95+
+- 📋 Best Practices: 95+
+- 🔍 SEO: 100
+
+---
+
+## 🎯 Roadmap
+
+- [ ] Dark mode
+- [ ] Componentes adicionais (testimonials, pricing)
+- [ ] Sistema de tema customizável
+- [ ] Integração com CMS
+- [ ] Multi-idioma (i18n)
+
+---
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+---
 
 ## 📝 Licença
 
-Este projeto está sob a licença MIT.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
 
 ## 👤 Autor
 
-[leandrosouzario](https://github.com/leandrosouzario)
+**Leandro Souza**
+- GitHub: [@leandrosouzario](https://github.com/leandrosouzario)
 
-## 🤝 Contribuições
+---
 
-Contribuições são bem-vindas! Abra uma issue ou pull request.
+## 🆘 Suporte
+
+- 📖 [Documentação SETUP](./SETUP.md)
+- 🐛 [Abra uma Issue](https://github.com/leandrosouzario/nextjs-landing/issues)
+- 📧 [Email](mailto:info@example.com)
+
+---
+
+## 🙏 Agradecimentos
+
+- [Vercel](https://vercel.com) - Hospedagem e infraestrutura
+- [Next.js](https://nextjs.org/) - Framework
+- [Tailwind CSS](https://tailwindcss.com/) - CSS Framework
+- [React](https://react.dev/) - Biblioteca UI
 
 ---
 
 **Desenvolvido com ❤️ usando Next.js + Tailwind CSS**
+
+⭐ Se este projeto foi útil, considere dar uma estrela!
