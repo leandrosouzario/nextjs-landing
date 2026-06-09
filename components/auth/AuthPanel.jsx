@@ -5,24 +5,30 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { getAuthRedirectUrl } from '@/lib/supabase/auth-redirect'
+import { validatePasswordPair } from '@/lib/password'
 
 const MODES = {
   signIn: 'signIn',
   signUp: 'signUp',
   magicLink: 'magicLink',
+  forgotPassword: 'forgotPassword',
 }
 
 const MODE_LABELS = {
   [MODES.signIn]: 'Entrar',
   [MODES.signUp]: 'Criar conta',
   [MODES.magicLink]: 'Entrar sem senha',
+  [MODES.forgotPassword]: 'Recuperar senha',
 }
 
 const MODE_DESCRIPTIONS = {
   [MODES.signIn]: 'Acesse sua conta com e-mail e senha',
   [MODES.signUp]: 'Crie sua conta e confirme pelo e-mail enviado',
   [MODES.magicLink]: 'Receba um link no e-mail para entrar sem senha',
+  [MODES.forgotPassword]: 'Enviaremos um link para redefinir sua senha',
 }
+
+const TAB_MODES = [MODES.signIn, MODES.signUp, MODES.magicLink]
 
 function getErrorMessage(error) {
   const message = error?.message?.toLowerCase() ?? ''
@@ -46,7 +52,19 @@ function getErrorMessage(error) {
   return error?.message ?? 'Ocorreu um erro. Tente novamente.'
 }
 
-export default function AuthPanel({ initialError }) {
+function safeRedirect(path) {
+  if (path && path.startsWith('/') && !path.startsWith('//')) {
+    return path
+  }
+
+  return '/'
+}
+
+export default function AuthPanel({
+  initialError,
+  initialSuccess,
+  redirectTo = '/',
+}) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -56,7 +74,7 @@ export default function AuthPanel({ initialError }) {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(initialError ?? '')
-  const [success, setSuccess] = useState('')
+  const [success, setSuccess] = useState(initialSuccess ?? '')
 
   function resetFeedback() {
     setError('')
@@ -87,7 +105,7 @@ export default function AuthPanel({ initialError }) {
       return
     }
 
-    router.push('/')
+    router.push(safeRedirect(redirectTo))
     router.refresh()
   }
 
@@ -95,13 +113,9 @@ export default function AuthPanel({ initialError }) {
     event.preventDefault()
     resetFeedback()
 
-    if (password.length < 8) {
-      setError('A senha deve ter pelo menos 8 caracteres.')
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError('As senhas não coincidem.')
+    const validation = validatePasswordPair(password, confirmPassword)
+    if (!validation.valid) {
+      setError(validation.error)
       return
     }
 
@@ -111,7 +125,7 @@ export default function AuthPanel({ initialError }) {
       email,
       password,
       options: {
-        emailRedirectTo: getAuthRedirectUrl(),
+        emailRedirectTo: getAuthRedirectUrl(redirectTo),
       },
     })
 
@@ -137,7 +151,7 @@ export default function AuthPanel({ initialError }) {
     const { error: otpError } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: getAuthRedirectUrl(),
+        emailRedirectTo: getAuthRedirectUrl(redirectTo),
         shouldCreateUser: false,
       },
     })
@@ -152,11 +166,34 @@ export default function AuthPanel({ initialError }) {
     setSuccess('Enviamos um link de acesso para o seu e-mail. Clique nele para entrar.')
   }
 
+  async function handleForgotPassword(event) {
+    event.preventDefault()
+    resetFeedback()
+    setLoading(true)
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: getAuthRedirectUrl('/auth/redefinir-senha'),
+    })
+
+    setLoading(false)
+
+    if (resetError) {
+      setError(getErrorMessage(resetError))
+      return
+    }
+
+    setSuccess('Enviamos um link para redefinir sua senha. Verifique sua caixa de entrada.')
+  }
+
   function handleSubmit(event) {
     if (mode === MODES.signIn) return handleSignIn(event)
     if (mode === MODES.signUp) return handleSignUp(event)
+    if (mode === MODES.forgotPassword) return handleForgotPassword(event)
     return handleMagicLink(event)
   }
+
+  const showPasswordFields = mode === MODES.signIn || mode === MODES.signUp
+  const showTabs = mode !== MODES.forgotPassword
 
   return (
     <div className="w-full max-w-md">
@@ -168,22 +205,24 @@ export default function AuthPanel({ initialError }) {
           {MODE_DESCRIPTIONS[mode]}
         </p>
 
-        <div className="flex rounded-lg bg-gray-100 p-1 mb-6">
-          {Object.values(MODES).map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => switchMode(item)}
-              className={`flex-1 rounded-md px-2 py-2 text-xs sm:text-sm font-medium transition-colors ${
-                mode === item
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {MODE_LABELS[item]}
-            </button>
-          ))}
-        </div>
+        {showTabs && (
+          <div className="flex rounded-lg bg-gray-100 p-1 mb-6">
+            {TAB_MODES.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => switchMode(item)}
+                className={`flex-1 rounded-md px-2 py-2 text-xs sm:text-sm font-medium transition-colors ${
+                  mode === item
+                    ? 'bg-white text-blue-600 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {MODE_LABELS[item]}
+              </button>
+            ))}
+          </div>
+        )}
 
         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -218,7 +257,7 @@ export default function AuthPanel({ initialError }) {
             />
           </div>
 
-          {mode !== MODES.magicLink && (
+          {showPasswordFields && (
             <div>
               <label
                 htmlFor="password"
@@ -238,6 +277,15 @@ export default function AuthPanel({ initialError }) {
                 placeholder="••••••••"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-colors"
               />
+              {mode === MODES.signIn && (
+                <button
+                  type="button"
+                  onClick={() => switchMode(MODES.forgotPassword)}
+                  className="mt-2 text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                >
+                  Esqueceu sua senha?
+                </button>
+              )}
             </div>
           )}
 
@@ -272,6 +320,18 @@ export default function AuthPanel({ initialError }) {
             {loading ? 'Aguarde...' : MODE_LABELS[mode]}
           </button>
         </form>
+
+        {mode === MODES.forgotPassword && (
+          <p className="text-center mt-4 text-sm text-gray-600">
+            <button
+              type="button"
+              onClick={() => switchMode(MODES.signIn)}
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            >
+              Voltar para o login
+            </button>
+          </p>
+        )}
 
         <p className="text-center mt-6 text-sm text-gray-600">
           <Link

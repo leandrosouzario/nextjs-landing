@@ -5,12 +5,19 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
+const NAV_LINKS = [
+  { href: '/#features', label: 'Recursos' },
+  { href: '/#cta', label: 'Começar' },
+  { href: '/#footer', label: 'Contato' },
+]
+
 export default function Header() {
   const router = useRouter()
   const supabase = useMemo(() => createClient(), [])
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [signingOut, setSigningOut] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -41,7 +48,20 @@ export default function Header() {
     }
   }, [supabase])
 
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false)
+  }
+
   async function handleSignOut() {
+    closeMobileMenu()
     setSigningOut(true)
     await supabase.auth.signOut()
     setSigningOut(false)
@@ -50,34 +70,25 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-md">
+    <header className="sticky top-0 z-50 bg-white shadow-md relative">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="flex items-center">
+          <Link href="/" className="flex items-center" onClick={closeMobileMenu}>
             <div className="text-2xl font-bold text-blue-600">
               NextJS Landing
             </div>
           </Link>
 
           <div className="hidden md:flex space-x-8">
-            <Link
-              href="/#features"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              Recursos
-            </Link>
-            <Link
-              href="/#cta"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              Começar
-            </Link>
-            <Link
-              href="/#footer"
-              className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
-            >
-              Contato
-            </Link>
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-gray-700 hover:text-blue-600 transition-colors font-medium"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
           <div className="hidden md:flex items-center gap-4">
@@ -85,6 +96,12 @@ export default function Header() {
               <span className="text-sm text-gray-400">...</span>
             ) : user ? (
               <>
+                <Link
+                  href="/perfil"
+                  className="text-sm text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                >
+                  Meu perfil
+                </Link>
                 <span className="text-sm text-gray-600 max-w-[180px] truncate">
                   {user.email}
                 </span>
@@ -117,23 +134,97 @@ export default function Header() {
               </Link>
             )}
             {!loading && user && (
-              <button
-                type="button"
-                onClick={handleSignOut}
-                disabled={signingOut}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium disabled:opacity-60"
+              <Link
+                href="/perfil"
+                className="px-3 py-2 text-gray-700 hover:text-blue-600 transition-colors text-sm font-medium"
               >
-                {signingOut ? '...' : 'Sair'}
-              </button>
+                Perfil
+              </Link>
             )}
-            <button className="p-2 rounded-lg hover:bg-gray-100" type="button">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+            <button
+              type="button"
+              className="p-2 rounded-lg hover:bg-gray-100"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              aria-label={mobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+              onClick={() => setMobileMenuOpen((open) => !open)}
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
       </nav>
+
+      {mobileMenuOpen && (
+        <>
+          <button
+            type="button"
+            className="md:hidden fixed inset-0 top-16 bg-black/30 z-40"
+            aria-label="Fechar menu"
+            onClick={closeMobileMenu}
+          />
+          <div
+            id="mobile-menu"
+            className="md:hidden absolute left-0 right-0 top-16 z-50 bg-white border-t border-gray-200 shadow-lg"
+          >
+            <div className="px-4 py-4 space-y-1">
+              {NAV_LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={closeMobileMenu}
+                  className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-blue-600 font-medium transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+
+              <div className="border-t border-gray-200 my-2 pt-2">
+                {loading ? (
+                  <p className="px-4 py-3 text-sm text-gray-400">Carregando...</p>
+                ) : user ? (
+                  <>
+                    <p className="px-4 py-2 text-sm text-gray-500 truncate">
+                      {user.email}
+                    </p>
+                    <Link
+                      href="/perfil"
+                      onClick={closeMobileMenu}
+                      className="block px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-blue-600 font-medium transition-colors"
+                    >
+                      Meu perfil
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleSignOut}
+                      disabled={signingOut}
+                      className="w-full text-left px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors disabled:opacity-60"
+                    >
+                      {signingOut ? 'Saindo...' : 'Sair'}
+                    </button>
+                  </>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={closeMobileMenu}
+                    className="block px-4 py-3 rounded-lg bg-blue-600 text-white text-center font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Entrar
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   )
 }

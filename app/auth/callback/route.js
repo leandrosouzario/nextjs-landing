@@ -1,12 +1,17 @@
 import { createClient } from '@/lib/supabase/server'
+import { safeRedirect } from '@/lib/supabase/auth-redirect'
 import { NextResponse } from 'next/server'
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/'
+  const next = safeRedirect(searchParams.get('next'))
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? 'https://pc.leandrosouza.info'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '')
+
+  if (!siteUrl) {
+    return NextResponse.redirect(new URL('/login?error=auth_callback_error', request.url))
+  }
 
   if (code) {
     const supabase = await createClient()

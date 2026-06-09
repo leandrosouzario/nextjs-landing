@@ -8,11 +8,20 @@ export default async function LoginPage({ searchParams }) {
       ? 'Não foi possível concluir a autenticação. O link pode ter expirado — tente novamente.'
       : ''
 
+  const initialSuccess =
+    params?.success === 'senha-redefinida'
+      ? 'Senha redefinida com sucesso. Faça login com sua nova senha.'
+      : ''
+
   return (
     <>
       <Header />
       <main className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gradient-to-r from-blue-600 to-purple-600 px-4 sm:px-6 lg:px-8 py-12">
-        <AuthPanel initialError={initialError} />
+        <AuthPanel
+          initialError={initialError}
+          initialSuccess={initialSuccess}
+          redirectTo={params?.next}
+        />
       </main>
     </>
   )
