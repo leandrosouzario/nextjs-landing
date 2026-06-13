@@ -1,13 +1,15 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Modern Landing Page - Next.js & Tailwind CSS',
-  description: 'Uma landing page moderna, responsiva e otimizada construída com Next.js 14 e Tailwind CSS',
-  keywords: 'nextjs, tailwindcss, landing page, webdesign',
+  title: 'Painel Corporativo — Aplicação Web Full Stack',
+  description:
+    'Painel corporativo demonstrativo com autenticação, módulos empresariais e arquitetura web moderna.',
+  keywords: 'painel corporativo, nextjs, supabase, full stack, dashboard',
   authors: [{ name: 'Leandro Souza' }],
   openGraph: {
-    title: 'Modern Landing Page',
-    description: 'Uma landing page moderna com Next.js e Tailwind CSS',
+    title: 'Painel Corporativo',
+    description:
+      'Experiência web moderna para centralizar operações e fluxos empresariais.',
     type: 'website',
   },
 }
